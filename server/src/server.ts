@@ -6,6 +6,7 @@ import { MONGODB_URI } from './util/secrets'
 
 const mongoUrl = MONGODB_URI
 
+mongoose.set('strictQuery', false)
 mongoose
   .connect(mongoUrl)
   .then(() => {

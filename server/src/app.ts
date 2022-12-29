@@ -1,12 +1,15 @@
 import express from 'express'
 import lusca from 'lusca'
 import dotenv from 'dotenv'
-
-import routers from './routes'
-import apiErrorHandler from './middlewares/apiErrorHandler'
-import apiContentType from './middlewares/apiContentType'
 import compression from 'compression'
 import cors from 'cors'
+import cookieParser from 'cookie-parser'
+import morgan from 'morgan'
+
+import routers from './routes'
+
+import apiErrorHandler from './middlewares/apiErrorHandler'
+import apiContentType from './middlewares/apiContentType'
 
 const corsOptions = {
   origin: '*',
@@ -22,9 +25,12 @@ app.use(cors(corsOptions))
 // Express configuration
 app.set('port', process.env.PORT || 1234)
 app.use(apiContentType)
+
 // Use common 3rd-party middlewares
+app.use(cookieParser())
 app.use(compression())
 app.use(express.json())
+app.use(morgan('tiny'))
 app.use(lusca.xframe('SAMEORIGIN'))
 app.use(lusca.xssProtection(true))
 

@@ -1,6 +1,7 @@
 import { UserDocument } from '../modules/user/user.model'
 import jwt from 'jsonwebtoken'
 import bcrypt from 'bcryptjs'
+import { JWT_SECRET } from './secrets'
 
 export const createToken = (user: UserDocument) => {
   // Sign the JWT
@@ -14,10 +15,12 @@ export const createToken = (user: UserDocument) => {
       username: user.username,
       role: user.role,
     },
-    'development_secret',
+    JWT_SECRET,
     { algorithm: 'HS256', expiresIn: '7d' }
   )
 }
+
+export const isTokenValid = ({ token }: any) => jwt.verify(token, JWT_SECRET)
 
 export const hashPassword = (password: string) => {
   return new Promise((resolve, reject) => {
@@ -37,8 +40,8 @@ export const hashPassword = (password: string) => {
 }
 
 export const verifyPassword = (
-  passwordAttempt: string,
+  candidatePassword: string,
   hashedPassword: string
 ) => {
-  return bcrypt.compare(passwordAttempt, hashedPassword)
+  return bcrypt.compare(candidatePassword, hashedPassword)
 }

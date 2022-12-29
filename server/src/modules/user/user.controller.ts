@@ -26,7 +26,17 @@ export const createUser = async (
 
     const result = await UserService.signup(user)
 
-    res.json(result)
+    const oneDay = 1000 * 60 * 60 * 24
+
+    res
+      .cookie('access_token', result?.token, {
+        httpOnly: true,
+        expires: new Date(Date.now() + oneDay),
+        secure: process.env.NODE_ENV === 'production',
+        // signed: true,
+      })
+      .status(201)
+      .json({ result })
   } catch (error) {
     if (error instanceof Error && error.name == 'ValidationError') {
       next(new BadRequestError('Invalid Request', error))
@@ -52,7 +62,6 @@ export const authenticate = async (
 
     const { username, password } = req.body
 
-    console.log(req.body)
     const user = new User({
       username,
       password,
@@ -60,7 +69,17 @@ export const authenticate = async (
 
     const result = await UserService.authenticate(user)
 
-    res.json(result)
+    const oneDay = 1000 * 60 * 60 * 24
+
+    res
+      .cookie('access_token', result?.token, {
+        httpOnly: true,
+        expires: new Date(Date.now() + oneDay),
+        secure: process.env.NODE_ENV === 'production',
+        // signed: true,
+      })
+      .status(200)
+      .json({ result })
   } catch (error) {
     if (error instanceof Error && error.name == 'ValidationError') {
       next(new BadRequestError('Invalid Request', error))
