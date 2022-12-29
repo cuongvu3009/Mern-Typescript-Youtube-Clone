@@ -52,3 +52,13 @@ export class ValidationRequestError extends ApiError {
     super(422, message, source)
   }
 }
+
+export class InvalidToken extends ApiError {
+  constructor(
+    readonly message: string = 'Invalid token',
+    readonly statusCode: number = 401,
+    source?: Error | any
+  ) {
+    super(statusCode, message, source)
+  }
+}

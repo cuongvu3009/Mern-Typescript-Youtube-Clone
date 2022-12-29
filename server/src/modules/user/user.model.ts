@@ -4,6 +4,7 @@ import mongoose, { Document } from 'mongoose'
 export type User = {
   _id: mongoose.Types.ObjectId
   username: string
+  role: UserRole
 }
 
 export const ADMIN = 'admin'

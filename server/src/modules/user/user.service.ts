@@ -1,5 +1,9 @@
 import jwtDecode from 'jwt-decode'
-import { BadRequestError, ForbiddenError } from '../../helpers/apiError'
+import {
+  BadRequestError,
+  ForbiddenError,
+  NotFoundError,
+} from '../../helpers/apiError'
 import User, { UserDocument } from './user.model'
 import {
   createToken,
@@ -89,7 +93,17 @@ const authenticate = async (
   }
 }
 
+const findOneById = async (id: string) => {
+  const foundUser = await User.findById(id).select('-password')
+  if (foundUser) {
+    return foundUser
+  } else {
+    throw new NotFoundError()
+  }
+}
+
 export default {
   signup,
   authenticate,
+  findOneById,
 }
