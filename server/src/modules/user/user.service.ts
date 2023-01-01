@@ -11,8 +11,11 @@ import {
   verifyPassword,
 } from '../../util/authentication'
 
-type MyToken = {
-  name: string
+export type MyToken = {
+  id: string
+  username: string
+  role: string
+  iat: number
   exp: number
 }
 
@@ -102,8 +105,77 @@ const findOneById = async (id: string) => {
   }
 }
 
+const getAllUsers = async () => {
+  const foundUsers = await User.find({})
+  if (foundUsers) {
+    return foundUsers
+  } else {
+    throw new NotFoundError()
+  }
+}
+
+const updateOne = async (id: string, update: Partial<UserDocument>) => {
+  const foundUser = await User.findByIdAndUpdate(id, update, {
+    new: true,
+    runValidators: true,
+  }).select('-password')
+  if (foundUser) {
+    return foundUser
+  } else {
+    throw new NotFoundError()
+  }
+}
+
+const deleteOne = async (id: string) => {
+  const foundUser = await User.findByIdAndDelete(id)
+  if (foundUser) {
+    return foundUser
+  } else {
+    throw new NotFoundError()
+  }
+}
+
+const subscribe = async (userId: string, subscribedUserId: string) => {
+  await User.findByIdAndUpdate(userId, {
+    $addToSet: { subscribedUsers: subscribedUserId },
+  })
+  await User.findByIdAndUpdate(subscribedUserId, {
+    $addToSet: { subscribers: userId },
+  })
+}
+
+const unsubscribe = async (userId: string, subscribingUserId: string) => {
+  await User.findByIdAndUpdate(userId, {
+    $pull: { subscribedUsers: subscribingUserId },
+  })
+  await User.findByIdAndUpdate(subscribingUserId, {
+    $pull: { subscribers: userId },
+  })
+}
+
+const likeVideo = async (userId: string, videoId: string) => {
+  // await Video.findByIdAndUpdate(videoId, {
+  //   $addToSet: { likes: userId },
+  //   $pull: { dislikes: userId },
+  // });
+}
+
+const dislikeVideo = async (userId: string, videoId: string) => {
+  // await Video.findByIdAndUpdate(videoId, {
+  //   $addToSet: { dislikes: userId },
+  //   $pull: { likes: userId },
+  // });
+}
+
 export default {
   signup,
   authenticate,
   findOneById,
+  getAllUsers,
+  updateOne,
+  deleteOne,
+  unsubscribe,
+  subscribe,
+  likeVideo,
+  dislikeVideo,
 }

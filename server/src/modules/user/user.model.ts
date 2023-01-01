@@ -1,10 +1,12 @@
 /* eslint-disable @typescript-eslint/member-delimiter-style */
-import mongoose, { Document } from 'mongoose'
+import mongoose, { Document, ObjectId } from 'mongoose'
 
-export type User = {
-  _id: mongoose.Types.ObjectId
+export interface GetUserInfoRequest extends Document {
+  id: string
   username: string
-  role: UserRole
+  role: string
+  iat: number
+  exp: number
 }
 
 export const ADMIN = 'admin'
@@ -12,14 +14,14 @@ export const USER = 'user'
 export type UserRole = typeof ADMIN | typeof USER
 
 export type UserDocument = Document & {
-  _id: mongoose.Types.ObjectId
+  _id: ObjectId
   username: string
   password: string
   role: UserRole
   profilePhoto: string
   created: Date
-  subscribers: [User]
-  subscribedUsers: [User]
+  subscribers: ObjectId[]
+  subscribedUsers: ObjectId[]
 }
 
 const userSchema = new mongoose.Schema<UserDocument>(
@@ -35,6 +37,7 @@ const userSchema = new mongoose.Schema<UserDocument>(
     },
     subscribedUsers: {
       type: [String],
+      default: [],
     },
     created: { type: Date, default: Date.now },
   },

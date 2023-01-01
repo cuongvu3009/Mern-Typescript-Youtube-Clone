@@ -89,32 +89,129 @@ export const authenticate = async (
   }
 }
 
-export const validateUser = [
-  body('username')
-    .exists()
-    .trim()
-    .withMessage('is required')
+//	update user
+export const updateUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params
+    const { username, password, role, profilePhoto } = req.body
+    return res.json(
+      await UserService.updateOne(id, {
+        username,
+        password,
+        role,
+        profilePhoto,
+      })
+    )
+  } catch (error) {
+    return next(error)
+  }
+}
 
-    .notEmpty()
-    .withMessage('cannot be blank')
+//	delete user
+export const deleteUser = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params
+    return res.json(await UserService.deleteOne(id))
+  } catch (error) {
+    return next(error)
+  }
+}
 
-    .isLength({ max: 16 })
-    .withMessage('must be at most 16 characters long')
+//	get user
+export const getUserById = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const { id } = req.params
+    return res.json(await UserService.findOneById(id))
+  } catch (error) {
+    return next(error)
+  }
+}
 
-    .matches(/^[a-zA-Z0-9_-]+$/)
-    .withMessage('contains invalid characters'),
+//	get users
+export const getAllUsers = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    return res.json(await UserService.getAllUsers())
+  } catch (error) {
+    return next(error)
+  }
+}
 
-  body('password')
-    .exists()
-    .trim()
-    .withMessage('is required')
+//	subscribe
+export const subscribe = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.user.id
+    const subscribedUserId = req.params.id
+    await UserService.subscribe(userId, subscribedUserId)
 
-    .notEmpty()
-    .withMessage('cannot be blank')
+    return res.json({ message: 'Subscribed successfully!' })
+  } catch (error) {
+    return next(error)
+  }
+}
 
-    .isLength({ min: 6 })
-    .withMessage('must be at least 6 characters long')
+//	unsubscribe
+export const unsubscribe = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.user.id
+    const subscribingUserId = req.params.id
+    await UserService.unsubscribe(userId, subscribingUserId)
 
-    .isLength({ max: 50 })
-    .withMessage('must be at most 50 characters long'),
-]
+    return res.json({ message: 'Unsubscribed successfully!' })
+  } catch (error) {
+    return next(error)
+  }
+}
+
+//	like
+export const likeVideo = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.user.id
+    const videoId = req.params.videoId
+    return res.json(await UserService.likeVideo(userId, videoId))
+  } catch (error) {
+    return next(error)
+  }
+}
+
+//	dislike
+export const dislikeVideo = async (
+  req: any,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const userId = req.user.id
+    const videoId = req.params.videoId
+    return res.json(await UserService.dislikeVideo(userId, videoId))
+  } catch (error) {
+    return next(error)
+  }
+}
